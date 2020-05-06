@@ -1,0 +1,49 @@
+use mis;
+
+drop table t_article;
+
+create table t_article (
+  id  int auto_increment ,
+  title varchar(200) not null,
+  content longtext  not null,
+  created datetime default now(),
+  thumbnail varchar(200)  default 'upload/placeholder.png',
+  hits int  default 0,
+  comments int  default 0,
+  primary key (id)
+);
+
+insert into t_article (title,content,comments) values
+('Vue.js前端框架介绍','<p>Vue.js是一套构建用户界面的渐进式框架。与其他重量级框架不同的是，Vue 采用自底向上增量开发的设计。Vue 的核心库只关注视图层，并且非常容易学习，非常容易与其它库或已有项目整合。</p>',2),
+('Spring的工作原理','<p>Spring是一种多层的J2EE应用程序框架，其核心就是提供一种新的机制管理业务对象及其依赖关系。它是一种容器框架，用于创建bean，维护bean之间的关系，它可以管理web层，持久层，业务层等，可以配置各个层的组件并且维护各个层的关系。</p>',1);
+
+drop table t_comment ;
+
+create table t_comment (
+  id  int auto_increment ,
+  articleid  int ,
+  content longtext  not null,
+  created datetime default now(),
+  author varchar(200)  default '匿名',
+  primary key (id)
+);
+
+insert into t_comment (articleid,content) values
+('1','vue效率高'),
+('1','vue3.0最新开源'),
+('2','springboot是快速开发Web服务框架');
+
+drop table t_notice ;
+
+create table t_notice (
+  id  int auto_increment ,
+  title varchar(200) not null,
+  content longtext  not null,
+  created datetime default now(),
+  primary key (id)
+);
+
+insert into t_notice (title,content) values
+('您的专属创作台已上线！','春耕、夏忙、秋收、冬藏，对于博主来说，自己的博客就像农夫耕耘的一亩三分地，以文字代码作为种子，用户的点赞、评论、收藏则是收获，写作中的思维逻辑再造更是锦上添花的乐事了。好马配好鞍才能事半功倍！拥有一个自己专属的工作台，想必是每位博主最迫切的渴望了。');
+
+

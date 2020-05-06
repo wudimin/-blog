@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sd.mapper.ArticleMapper">
+
+    <!-- 查询所有新闻列表 按发布时间排序-->
+    <select id="selectArticlesOrderByDate"  resultType="Article">
+        select id,title,created,thumbnail,hits,comments from t_article order by id desc 
+    </select>
+    
+    <!-- 查询所有新闻 按点击量、评论数量排序-->
+    <select id="selectArticlesOrderByHits"  resultType="Article">
+        select id,title,created,thumbnail,hits,comments from t_article order by hits desc,comments desc  limit 0,9
+    </select>
+
+    <!-- 根据id查询 新闻详情 附带该文章所有评论 -->
+    <select id="selectArticleById" parameterType="Integer" resultMap="articleWithComment">
+        select a.*,c.id c_id,c.content c_content,c.created c_created,c.author from t_article a left join t_comment c on a.id=c.articleid where a.id=#{id} order by c_id desc
+    </select>
+    <resultMap id="articleWithComment" type="Article">
+        <id property="id" column="id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="created" column="created" />
+        <result property="thumbnail" column="thumbnail" />
+        <result property="hits" column="hits" />
+        <result property="comments" column="comments" />
+        <collection property="commentList" ofType="Comment">
+            <id property="id" column="c_id" />
+            <result property="content" column="c_content" />
+            <result property="created" column="c_created" />
+            <result property="author" column="author" />
+        </collection>
+    </resultMap>
+
+    <!-- 查询所有新闻标题列表及附带的所有评论 供管理员使用-->
+    <select id="selectTitlesWithComment" resultMap="titlesWithComment">
+        select a.id,a.title,c.id c_id,c.content c_content,c.created c_created,c.author from t_article a,t_comment c where a.id=c.articleid 
+    </select>
+    <resultMap id="titlesWithComment" type="Article">
+        <id property="id" column="id" />
+        <result property="title" column="title" />
+        <collection property="commentList" ofType="Comment">
+            <id property="id" column="c_id" />
+            <result property="content" column="c_content" />
+            <result property="created" column="c_created" />
+            <result property="author" column="author" />
+        </collection>
+    </resultMap>
+
+    <!-- 发布一个新闻 -->
+    <insert id="insertArticle" parameterType="Article" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into t_article (title,content,thumbnail) values(#{title},#{content},#{thumbnail})
+    </insert>
+
+    <!-- 修改新闻 -->
+    <update id="updateArticle" parameterType="Article" >
+        update t_article
+        <set>
+            <if test="title != null and title != '' ">
+                title=#{title},
+            </if>
+            <if test="content != null and content != '' ">
+                content=#{content},
+            </if>
+            <if test="thumbnail != null and thumbnail != '' ">
+                thumbnail=#{thumbnail}
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <!-- 删除新闻 -->
+    <delete id="deleteArticleById" parameterType="Integer" >
+        delete  from t_article where id=#{id}
+    </delete>
+    
+    <!-- 增加点击量 -->
+    <update id="updateArticleHitsById" parameterType="Integer" >
+        update t_article set hits=hits+1 where id=#{id}
+    </update>
+    
+    <!-- 增加评论量 -->
+    <update id="updateArticleCommentsById" parameterType="Integer" >
+        update t_article set comments=comments+1 where id=#{id}
+    </update>    
+    
+</mapper>
